@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="http://localhost:3001/css/style.css" />
+    <title>Todo App</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="form">
+        <div class="signUp">
+          <h1>Sign Up</h1>
+          <label for="username">Username</label>
+          <input type="email" name="email" id="email" />
+          <label for="password">Password</label>
+          <input type="password" name="password" id="password" />
+          <button class="signUpBtn" onclick="signUp()">SignUp</button>
+          <div id="signUpResponse"></div>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <div class="signIn">
+          <h1>Sign In</h1>
+          <label for="username">Username</label>
+          <input type="username" name="username" id="signInUsername" />
+          <label for="password">Password</label>
+          <input type="password" name="password" id="signInPassword" />
+          <button class="signInBtn" onclick="signIn()">SignIn</button>
+          <div id="signInResponse"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      async function signUp() {
+        const username = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        const responseBody = {
+          username: username,
+          password: password,
+        };
+
+        try {
+          const response = await fetch("http://localhost:3001/signup", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(responseBody),
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+            document.getElementById("signUpResponse").innerHTML =
+              result.message;
+          } else {
+            alert(result.message || "Failed to sign up..!");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("An error occurred while signing up.");
+        }
+        document.getElementById("email").value = "";
+        document.getElementById("password").value = "";
+      }
+
+      async function signIn() {
+        const signInUsername = document.getElementById("signInUsername").value;
+        const signInPassword = document.getElementById("signInPassword").value;
+
+        const responseBody = {
+          username: signInUsername,
+          password: signInPassword,
+        };
+
+        try {
+          const response = await fetch("http://localhost:3001/signin", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(responseBody),
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+            window.location.href = "/public/todo.html";
+            localStorage.setItem("authToken", result.token);
+          } else {
+            alert(result.message || "Failed to sign in..!");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("An error occurred While Signing You In");
+        }
+        document.getElementById("signInUsername").value = "";
+        document.getElementById("signInPassword").value = "";
+      }
+    </script>
+  </body>
+</html>

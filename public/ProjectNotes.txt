@@ -1,0 +1,2 @@
+jwt.sign() = method is used for creating new json web token 
+jwt.verify() = used for verifying the token using the secret key

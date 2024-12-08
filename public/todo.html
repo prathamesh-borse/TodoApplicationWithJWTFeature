@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo Page</title>
+    <link rel="stylesheet" href="http://localhost:3001/css/todoStyle.css" />
+  </head>
+  <body>
+    <div class="todos">
+      <h1 class="welcome"></h1>
+      <button class="logoutBtn" onclick="logout()">Logout</button>
+      <div class="formTodo">
+        <label for="todo">Enter Todos</label>
+        <input type="text" name="todo" id="todo" />
+        <div id="savedTodo"></div>
+      </div>
+      <br /><br />
+      <button class="addBtn" onclick="addTodo()">Add Todo</button>
+      <br /><br />
+    </div>
+    <h1>Your Todos</h1>
+    <div class="todos">
+      <table>
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Todo</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="responseData"></tbody>
+      </table>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", async function () {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          alert("You are not authorized. Please sign in.");
+          window.location.href = "/index.html";
+          return;
+        }
+
+        try {
+          // Call the /me endpoint
+          const response = await fetch("http://localhost:3001/me", {
+            method: "GET",
+            headers: {
+              Authorization: token, // Pass the token in the Authorization header
+            },
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            // Display the welcome message with the username
+            document.getElementsByClassName(
+              "welcome"
+            )[0].innerHTML = `Welcome, ${result.username}`;
+          } else {
+            alert("Invalid token. Redirecting to sign in...");
+            window.location.href = "public/index.html";
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("An error occurred. Please try again.");
+          window.location.href = "public/index.html";
+        }
+
+        try {
+          const response = await fetch("http://localhost:3001/all", {
+            method: "GET",
+          });
+
+          const result = await response.json();
+          const todos = result.todos;
+          const tableBody = document.getElementById("responseData");
+          tableBody.innerHTML = "";
+
+          todos.forEach((todo) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${todo.id}</td><td>${todo.todo}</td><td><button class="updateBtn" onClick="updateTodo(${todo.id})">Update</button>  <button class="deleteBtn" onClick="deleteTodo(${todo.id})">Delete</button></td>`;
+            tableBody.appendChild(row);
+          });
+        } catch (error) {
+          console.error("Error fetching todos:", error);
+        }
+      });
+
+      async function addTodo() {
+        const todo = document.getElementById("todo").value;
+
+        const responseBody = {
+          todo: todo,
+        };
+
+        try {
+          const response = await fetch("http://localhost:3001/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `${localStorage.getItem("authToken")}`,
+            },
+            body: JSON.stringify(responseBody),
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+            // Display success message
+            document.getElementById("savedTodo").innerHTML =
+              "Todo added successfully!";
+
+            // Dynamically add the new todo to the table
+            loadTodo();
+          } else {
+            // Display error message
+            document.getElementById("savedTodo").innerHTML =
+              result.message || "Failed to add todo.";
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          document.getElementById("savedTodo").innerHTML = "Error adding todo.";
+        }
+        document.getElementById("todo").value = "";
+        document.getElementById("savedTodo").innerHTML = "";
+      }
+
+      async function updateTodo(id) {
+        console.log(id);
+        const updatedTask = prompt("Enter the updated task:");
+        console.log(updatedTask);
+        if (!updatedTask || updatedTask.trim() == "") {
+          alert("Updated Task cannot be empty");
+          return;
+        }
+        const responseBody = {
+          task: updatedTask.trim(),
+        };
+
+        try {
+          const response = await fetch(
+            `http://localhost:3001/update?id=${id}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: localStorage.getItem("authToken"),
+              },
+              body: JSON.stringify(responseBody),
+            }
+          );
+
+          const result = response.json();
+          if (response.ok) {
+            alert(result.message || "Todo updated successfully.");
+            loadTodo();
+          } else {
+            alert(result.message || "Failed to update Todo");
+          }
+        } catch (error) {
+          console.log("error", error);
+          alert("An error occurred while updating an Todo");
+        }
+      }
+
+      async function deleteTodo(id) {
+        console.log(id);
+        try {
+          const response = await fetch(
+            `http://localhost:3001/delete?id=${id}`,
+            {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: localStorage.getItem("authToken"),
+              },
+            }
+          );
+
+          if (response.ok) {
+            alert("Todo deleted successfully.");
+            loadTodo();
+          } else {
+            const result = await response.json();
+            alert(result.message || "Failed to delete the todo.");
+          }
+        } catch (error) {
+          console.log("error: ", error);
+          alert("An error occurred whil deleting Todo");
+        }
+      }
+
+      async function loadTodo() {
+        try {
+          const response = await fetch("http://localhost:3001/all", {
+            method: "GET",
+          });
+
+          const result = await response.json();
+          const todos = result.todos;
+          const tableBody = document.getElementById("responseData");
+          tableBody.innerHTML = "";
+
+          todos.forEach((todo) => {
+            const row = document.createElement("tr");
+            row.setAttribute("data-id", todo.id);
+            row.innerHTML = `<td>${todo.id}</td><td>${todo.todo}</td><td><button class="updateBtn" onClick="updateTodo(${todo.id})">Update</button>  <button class="deleteBtn" onClick="deleteTodo(${todo.id})">Delete</button></td>`;
+            tableBody.appendChild(row);
+          });
+        } catch (error) {
+          console.error("Error fetching todos:", error);
+        }
+      }
+
+      async function logout() {
+        localStorage.removeItem("authToken");
+        window.location.href = "/public/index.html";
+      }
+    </script>
+  </body>
+</html>

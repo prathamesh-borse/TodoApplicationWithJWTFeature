@@ -1,0 +1,99 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: burlywood;
+}
+
+.welcome {
+    text-align: center;
+    margin-top: 15px;
+    color: white;
+}
+
+label {
+    color: white;
+    font-size: 25px;
+    font-weight: 700;
+    margin-left: 20px;
+    padding: 20px 0;
+}
+
+input {
+    padding: 10px 20px;
+    border: 1px solid black;
+    outline: none;
+    font-size: 18px;
+    margin-left: 5px;
+    color: white;
+    font-weight: 500;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: white;
+}
+
+button {
+    cursor: pointer;
+    border: 0;
+    border-radius: 4px;
+    font-weight: 600;
+    height: 35px;
+    padding: 10px 0;
+    box-shadow: 0 0 20px rgba(104, 85, 224, 0.2);
+    transition: 0.4s;
+    margin-bottom: 10px;
+}
+
+.logoutBtn {
+    font-size: 18px;
+    background-color: burlywood;
+    border: 1px solid black;
+    padding: 5px 0;
+    width: 100px;
+    margin-left: 650px;
+}
+
+
+.addBtn {
+    font-size: 18px;
+    background-color: burlywood;
+    border: 1px solid black;
+    padding: 5px 30px;
+    margin-left: 100px;
+}
+
+.updateBtn {
+    font-size: 18px;
+    background-color: burlywood;
+    border: 1px solid black;
+    padding: 5px 10px;
+    margin-right: 12px;
+}
+
+.deleteBtn {
+    font-size: 18px;
+    background-color: burlywood;
+    border: 1px solid black;
+    padding: 5px 10px;
+}
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 80%;
+    margin-left: 15%;
+}
+
+td,
+th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
